@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+    <!-- <beans:import resource="/spring-database.xml"/> -->
+    <http use-expressions="true" auto-config="true">
+        <intercept-url pattern="/auth/login" access="permitAll"/>
+        <intercept-url pattern="/test/admin" access="hasRole('ROLE_ADMIN')"/>
+        <intercept-url pattern="/test/common" access="hasRole('ROLE_USER')"/>
+        <form-login login-page="/auth/login"
+                    authentication-failure-url="/auth/login?error=true"
+                    login-processing-url="/check_action"
+                    default-target-url="/test/common"
+                    always-use-default-target="true"
+                    username-parameter="username"
+                    password-parameter="password"/>
+        <logout logout-success-url="/auth/login"
+                invalidate-session="true"
+                logout-url="/auth/logout"/>
+        <!-- <access-denied-handler error-page="/auth/denied"/> -->
+        <!-- <session-management>
+            <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
+        </session-management> -->
+    </http>
+    <authentication-manager>
+        <authentication-provider user-service-ref="customerUserDetailService">
+            <!-- <jdbc-user-service data-source-ref="dataSource"
+                users-by-username-query="select username username,password password,enabled enabled from _user where username=?"
+                authorities-by-username-query="select username username,role role from _user_role where username=?"/> -->
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="customerUserDetailService" class="com.lvlv.CustomerUserDetailsService"></beans:bean>
+</beans:beans>
